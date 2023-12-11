@@ -36,6 +36,7 @@
 import { defineComponent } from 'vue';
 import TimeLine from './TimeLine.vue';
 import TimePanel from './TimePanel.vue';
+import { ActivityItem } from '../interfaces';
 
 export default defineComponent({
     name: "GroupTable",
@@ -47,7 +48,7 @@ export default defineComponent({
     created() {
          for (let user in this.group.users) {
              let result = 0;
-             this.group.users[user]?.activities?.forEach(activity => {
+             this.group.users[user]?.activities?.forEach((activity: ActivityItem) => {
                 const startDate = new Date(activity.created_at);
                 const start = (startDate.getHours() * 60 + startDate.getMinutes()) / 1440 * 100;
                 result += activity.duration;

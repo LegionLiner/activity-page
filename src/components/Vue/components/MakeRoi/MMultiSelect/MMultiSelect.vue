@@ -63,9 +63,13 @@
 import dropdownImg from '../../../assets/img/dropdown.svg';
 import {defineComponent, type PropType} from 'vue';
 import {getCountLabel} from '../lib';
-import type {DropdownItem, DropdownValue} from '../../../type';
 import MultiSelectList from './MultiSelectList.vue';
 import CheckBox from '../MCheckbox/MCheckbox.vue';
+interface DropdownItem {
+    title: string,
+    value: DropdownValue
+}
+type DropdownValue = number | string;
 
 export default defineComponent({
     components: {CheckBox, MultiSelectList},
