@@ -1,27 +1,34 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+  <ActivityPanel></ActivityPanel>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+import ActivityPanel from './components/ActivityPanel.vue';
 
 export default defineComponent({
   name: 'App',
   components: {
-    HelloWorld
+    ActivityPanel
   }
 });
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+body {
+  margin: 0;
+  background: #153042;
+  font-family: PT Sans;
+  overflow-x: hidden;
+}
+body::-webkit-scrollbar {
+  width: 6px;
+}
+body::-webkit-scrollbar-track {
+  background: rgba(4, 21, 34, 1);
+}
+body::-webkit-scrollbar-thumb {
+  background-color: rgba(95, 131, 154, 1);
+  border-radius: 10px;
 }
 </style>
