@@ -21,11 +21,12 @@ export interface Groups {
     id: number,
     name: string
 }
-export interface Users {
+export interface User {
     name: string,
     id: number,
     group_id: number,
-    activities: ActivityItem[]
+    activities: ActivityItem[],
+    overall: number
 }
 export interface ActivityTypes {
     name: string,
@@ -33,6 +34,6 @@ export interface ActivityTypes {
 }
 export interface Info {
     groups: Groups[],
-    users: Users[].
+    users: User[],
     activity_types: ActivityTypes[]
 }

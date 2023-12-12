@@ -5,15 +5,28 @@
                 </div>
                 <div class="filter_block">
                     <div class="filter users">
-                        <MMultiSelect :labels="['Элемент','Элемента','Элементов']" :items="[{'value':1,'title':'item1'},{'value':2,'title':'item2'}]" :checked="[1]" placeholder="Выберите элементы" :disabled="false" @set-checked="setChecked"></MMultiSelect>
+                        <MMultiSelect 
+                        :labels="['Пользователь','Пользователя','Пользователей']"
+                        :items="users"
+                        :checked="checkedUsers"
+                        placeholder="Пользователи"
+                        @set-checked="setCheckedUsers"></MMultiSelect>
                         <!-- <img src="images/user.svg"> -->
                     </div>
                     <div class="filter date">
-                        <MDate></MDate>
+                        <MDate
+                        placeholder="Дата"
+                        @set-selected="setSelected"
+                        ></MDate>
                         <!-- <img src="images/date.svg"> -->
                     </div>
                     <div class="filter activities">
-                        <MMultiSelect :labels="['Элемент','Элемента','Элементов']" :items="[{'value':1,'title':'item1'},{'value':2,'title':'item2'}]" :checked="[1]" placeholder="Выберите элементы" :disabled="false" @set-checked="setChecked"></MMultiSelect>
+                        <MMultiSelect 
+                        :labels="['Тип','Типа','Типов']" 
+                        :items="activityTypes" 
+                        :checked="checkedActivityTypes" 
+                        placeholder="Типы активности" 
+                        @set-checked="setCheckedActivities"></MMultiSelect>
                             <!-- <img src="images/activity.svg"> -->
                     </div>
                 </div>
@@ -24,12 +37,53 @@
 import { defineComponent } from 'vue';
 import MMultiSelect from './Vue/components/MakeRoi/MMultiSelect/MMultiSelect.vue';
 import MDate from './Vue/components/MakeRoi/MDate/MDate.vue';
+import { User, ActivityTypes } from '../interfaces';
+interface DropdownItem {
+    title: string,
+    value: DropdownValue
+}
+type DropdownValue = number | string;
+
 
 export default defineComponent({
     name: "PanelHeader",
     components: {
         MMultiSelect,
         MDate
+    },
+    props: ['info'],
+    emits: ['filter-users', 'filter-date', 'filter-activities'],
+    data() {
+        return {
+            users: [] as DropdownItem[],
+            activityTypes: [] as DropdownItem[],
+        }
+    },
+    methods: {
+        setCheckedUsers(users: number[]): void {
+            this.$emit('filter-users', users)
+        },
+        setCheckedActivities(activities: number[]): void {
+            this.$emit('filter-activities', activities)
+        },
+        setSelected(date: number): void {
+            this.$emit('filter-date', date)
+        }
+    },
+    created() {
+        this.info.data.users.forEach((user: User) => {
+            this.users.push({
+                value: user.id,
+                title: user.name
+            })
+        });
+        this.info.data.activity_types.forEach((activity: ActivityTypes) => {
+            this.activityTypes.push({
+                value: activity.id,
+                title: activity.name
+            })
+        });
+        
     }
 });
 </script>

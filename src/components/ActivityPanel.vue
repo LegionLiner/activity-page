@@ -1,12 +1,12 @@
 <template>
   <div class="main_wrapper">
         <div class="activity_wrapper">
-            <PanelHeader></PanelHeader>
+            <PanelHeader :info="info" @filter-users="filterUsers" @filter-date="filterDate" @filter-activities="filterActivities"></PanelHeader>
             <div class="main">
                 <div class="group" v-for="group in groups">
                     <div class="group_info">
                         <p class="group_name">{{ group.name }}</p>
-                        <img src="../assets/images/sort.svg">
+                        <img src="../assets/images/sort.svg" @click="sortGroup(group)">
                         <img class="toggler" src="../assets/images/active-panel.svg" @click="toggleGroup(group)" :class="{'reverse': !group.active }">
                     </div>
                     <GroupTable v-if="group.active" :group="group" :types="types"></GroupTable>
@@ -17,19 +17,23 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, toRaw } from 'vue';
 import PanelHeader from './PanelHeader.vue';
 import GroupTable from './GroupTable.vue';
-import { Groups, Users, ActivityTypes, Info, ActivityItem } from '../interfaces';
+import { Groups, User, ActivityTypes, Info, ActivityItem } from '../interfaces';
 interface Group {
     [key: number]: {
         active: boolean,
         id: number,
         name: string,
-        users: {
-            [key: number]: Users
-        }
+        users: User[],
+        sort: number
     }
+}
+interface Filter {
+    users: number[],
+    date: number,
+    activities: number[]
 }
 
 const colors: string[] = ['#ffce6d', '#feff9f', '#fecaca', '#99cafd', '#C1C1C1', '#D5D8DB', '#CCFF66'];
@@ -221,44 +225,125 @@ export default defineComponent({
   },
   data() {
     return {
+        originGroups: {},
         groups: {},
-        types: {}
+        types: {},
+        filters: {} as Filter,
+        info
     }
   },
   methods: {
-    toggleGroup(group: any): void {
+    toggleGroup(group: any): void { 
         group.active = !group.active;
+    },
+    sortGroup(group: any): void {
+        if (group.sort == 0 || group.sort == -1) {
+            group.sort = 1;
+            group.users.sort((a: any, b: any) => {
+                return a.overall < b.overall ? 1 : -1
+            });  
+        } else if (group.sort == 1) {
+            group.sort = -1;
+            group.users.sort((a: any, b: any) => {
+                return a.overall < b.overall ? -1 : 1
+            }); 
+        }
+    },
+    filterUsers(users: number[]): void {
+        this.filters.users = users;
+        this.filterData();
+    },
+    filterDate(date: number): void {
+        this.filters.date = date;
+        this.filterData();
+    },
+    filterActivities(activities: number[]): void {
+        this.filters.activities = activities;
+        this.filterData();
+    },
+    filterData(): void {
+        let resultedGroups: any = {};
+
+        for (let originGroup in this.originGroups) {
+            // @ts-ignore
+            let group = structuredClone(toRaw(this.originGroups[originGroup]));
+            
+            group.users = group.users.filter((user: User) => {
+                let isValidUser = false;
+                let isValidType = false;
+                let isValidDate = false;
+                
+                if (this.filters?.users?.includes(user.id) || !this.filters?.users?.length) {
+                    isValidUser = true;
+                }
+                user.activities.filter((activity: ActivityItem) => { 
+                    if (this.filters?.activities?.includes(activity.type)) isValidType = true;
+                    const cDay = new Date(this.filters.date).getDate();
+                    const cMonth = new Date(this.filters.date).getMonth();
+
+                    const aDay = new Date(activity.created_at).getDate();
+                    const aMonth = new Date(activity.created_at).getMonth();  
+                    
+                    if ((cDay === aDay) && (cMonth === aMonth)) {
+                        isValidDate = true;
+                    }
+                })
+                if (!this.filters?.date) isValidDate = true;
+                if (!this.filters?.activities?.length) isValidType = true;
+                console.log(isValidUser, isValidType, isValidDate, user);
+                
+                return isValidUser && isValidType && isValidDate;
+                
+            })
+
+            if (group.users.length) {
+                resultedGroups[originGroup] = group;
+            }
+        }
+        console.log(resultedGroups);
+        
+        this.groups = resultedGroups;
+        
     }
   },
   created() {
-    let result:Group = {};
+    let result: Group = {};
     for (let group of info.data.groups as Groups[]) {
         result[group.id] = {
             name: group.name,
             id: group.id,
-            users: {},
-            active: true
+            users: [],
+            active: true,
+            sort: 0
         }
     }
     for (let activity of activityItems.data.activity_items as ActivityItem[]) {
-        for (let user of info.data.users as Users[]) {
+        for (let user of info.data.users as User[]) {
             if (user.id == activity.user_id) {
                 if (!user.activities) user.activities = [];
                 user.activities.push(activity);
             }
         }
     }
-    for (let user of info.data.users as Users[]) {      
+    for (let user of info.data.users as User[]) {
         let group = result[user.group_id];
-        group.users[user.id] = {
+        let overall = 0;
+
+        user.activities?.forEach((activity) => {
+            overall += activity.duration;
+        })
+        group.users.push({
             name: user.name,
             id: user.id,
             group_id: user.group_id,
-            activities: user.activities || []
-        }
+            activities: user.activities || [],
+            overall: overall
+        })
     } 
     this.groups = result;
-    let types:{ [key: number]: Object } = {};
+    // @ts-ignore
+    this.originGroups = structuredClone(result);
+    let types: { [key: number]: Object } = {};
     for (let type of info.data.activity_types as ActivityTypes[]) {
         types[type.id] = {
             name: type.name,

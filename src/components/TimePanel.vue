@@ -39,6 +39,23 @@ export default defineComponent({
             const minutes = date.getMinutes();
             this.activities[activity].time = `${hours}ч ${minutes}м`;
         } 
+    },
+    updated() {  
+        this.activities = {};
+        for (let activity in this.userActivity) {
+            const type = this.userActivity[activity].type as number;
+            if (!this.activities[type]) this.activities[type] = {
+                overall: 0,
+                color: this.types[type].color
+            };
+            this.activities[type].overall += this.userActivity[activity].duration;
+        }
+        for (let activity in this.activities) {
+            const date = new Date(this.activities[activity].overall);
+            const hours = date.getHours() - 3;
+            const minutes = date.getMinutes();
+            this.activities[activity].time = `${hours}ч ${minutes}м`;
+        } 
     }
 })
 </script>
