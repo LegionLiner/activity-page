@@ -45,55 +45,37 @@ export default defineComponent({
         TimeLine,
         TimePanel
     },
+    methods: {
+        updateTable(): void {
+            for (let user in this.group.users) {
+                let result = 0;
+                this.group.users[user]?.activities?.forEach((activity: ActivityItem) => {
+                    const startDate = new Date(activity.created_at);
+                    const start = (startDate.getHours() * 60 + startDate.getMinutes()) / 1440 * 100;
+                    result += activity.duration;
+                    const actDate = new Date(activity.duration);
+                    const hours = actDate.getHours() - 3;
+                    const minutes = actDate.getMinutes();
+                    activity.time = {
+                        label: `${hours}ч ${minutes}м`,
+                        name: this.types[activity.type].name,
+                        start: start,
+                        part: ((activity.duration / 1000) / 60 / 1440) * 100,
+                        color: this.types[activity.type].color
+                    } 
+                });
+                const date = new Date(result);
+                const hours = date.getHours() - 3;
+                const minutes = date.getMinutes();
+                this.group.users[user].time = `${hours}ч ${minutes}м`;
+            }
+        }
+    },
     mounted() {
-        for (let user in this.group.users) {
-             let result = 0;
-             this.group.users[user]?.activities?.forEach((activity: ActivityItem) => {
-                
-                const startDate = new Date(activity.created_at);
-                const start = (startDate.getHours() * 60 + startDate.getMinutes()) / 1440 * 100;
-                result += activity.duration;
-                const actDate = new Date(activity.duration);
-                const hours = actDate.getHours() - 3;
-                const minutes = actDate.getMinutes();
-                activity.time = {
-                    label: `${hours}ч ${minutes}м`,
-                    name: this.types[activity.type].name,
-                    start: start,
-                    part: ((activity.duration / 1000) / 60 / 1440) * 100,
-                    color: this.types[activity.type].color
-                } 
-             });
-             const date = new Date(result);
-             const hours = date.getHours() - 3;
-             const minutes = date.getMinutes();
-             this.group.users[user].time = `${hours}ч ${minutes}м`;
-         }
+        this.updateTable();
     },
     updated() {
-         for (let user in this.group.users) {
-             let result = 0;
-             this.group.users[user]?.activities?.forEach((activity: ActivityItem) => {
-                
-                const startDate = new Date(activity.created_at);
-                const start = (startDate.getHours() * 60 + startDate.getMinutes()) / 1440 * 100;
-                result += activity.duration;
-                const actDate = new Date(activity.duration);
-                const hours = actDate.getHours() - 3;
-                const minutes = actDate.getMinutes();
-                activity.time = {
-                    label: `${hours}ч ${minutes}м`,
-                    name: this.types[activity.type].name,
-                    start: start,
-                    part: ((activity.duration / 1000) / 60 / 1440) * 100,
-                    color: this.types[activity.type].color
-                }    
-             });
-             const date = new Date(result);
-             const hours = date.getHours() - 3;
-             const minutes = date.getMinutes();
-             this.group.users[user].time = `${hours}ч ${minutes}м`;
-         }
+        this.updateTable();
     }
 });
 </script>

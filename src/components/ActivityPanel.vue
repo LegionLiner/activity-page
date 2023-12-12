@@ -20,21 +20,8 @@
 import { defineComponent, toRaw } from 'vue';
 import PanelHeader from './PanelHeader.vue';
 import GroupTable from './GroupTable.vue';
-import { Groups, User, ActivityTypes, Info, ActivityItem } from '../interfaces';
-interface Group {
-    [key: number]: {
-        active: boolean,
-        id: number,
-        name: string,
-        users: User[],
-        sort: number
-    }
-}
-interface Filter {
-    users: number[],
-    date: number,
-    activities: number[]
-}
+import { Group, Filter, Groups, User, ActivityTypes, Info, ActivityItem } from '../interfaces';
+
 
 const colors: string[] = ['#ffce6d', '#feff9f', '#fecaca', '#99cafd', '#C1C1C1', '#D5D8DB', '#CCFF66'];
 function getRandomColor(): string {
@@ -263,16 +250,13 @@ export default defineComponent({
     },
     filterData(): void {
         let resultedGroups: any = {};
-
         for (let originGroup in this.originGroups) {
             // @ts-ignore
             let group = structuredClone(toRaw(this.originGroups[originGroup]));
-            
             group.users = group.users.filter((user: User) => {
                 let isValidUser = false;
                 let isValidType = false;
                 let isValidDate = false;
-                
                 if (this.filters?.users?.includes(user.id) || !this.filters?.users?.length) {
                     isValidUser = true;
                 }
@@ -284,24 +268,14 @@ export default defineComponent({
                     const aDay = new Date(activity.created_at).getDate();
                     const aMonth = new Date(activity.created_at).getMonth();  
                     
-                    if ((cDay === aDay) && (cMonth === aMonth)) {
-                        isValidDate = true;
-                    }
+                    if ((cDay === aDay) && (cMonth === aMonth)) isValidDate = true;
                 })
                 if (!this.filters?.date) isValidDate = true;
                 if (!this.filters?.activities?.length) isValidType = true;
-                console.log(isValidUser, isValidType, isValidDate, user);
-                
                 return isValidUser && isValidType && isValidDate;
-                
             })
-
-            if (group.users.length) {
-                resultedGroups[originGroup] = group;
-            }
+            if (group.users.length) resultedGroups[originGroup] = group;
         }
-        console.log(resultedGroups);
-        
         this.groups = resultedGroups;
         
     }
@@ -328,7 +302,6 @@ export default defineComponent({
     for (let user of info.data.users as User[]) {
         let group = result[user.group_id];
         let overall = 0;
-
         user.activities?.forEach((activity) => {
             overall += activity.duration;
         })

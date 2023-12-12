@@ -8,7 +8,7 @@
       <div
           v-for="item in items"
           :key="item.value"
-          class="item cursor-default"
+          class="item cursor-default overflow-hidden"
       >
         <div class="mr-1.5">
           <CheckBox

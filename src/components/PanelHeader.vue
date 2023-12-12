@@ -8,26 +8,21 @@
                         <MMultiSelect 
                         :labels="['Пользователь','Пользователя','Пользователей']"
                         :items="users"
-                        :checked="checkedUsers"
                         placeholder="Пользователи"
                         @set-checked="setCheckedUsers"></MMultiSelect>
-                        <!-- <img src="images/user.svg"> -->
                     </div>
                     <div class="filter date">
                         <MDate
                         placeholder="Дата"
                         @set-selected="setSelected"
                         ></MDate>
-                        <!-- <img src="images/date.svg"> -->
                     </div>
                     <div class="filter activities">
                         <MMultiSelect 
                         :labels="['Тип','Типа','Типов']" 
                         :items="activityTypes" 
-                        :checked="checkedActivityTypes" 
                         placeholder="Типы активности" 
                         @set-checked="setCheckedActivities"></MMultiSelect>
-                            <!-- <img src="images/activity.svg"> -->
                     </div>
                 </div>
             </div>

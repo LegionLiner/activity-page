@@ -37,3 +37,17 @@ export interface Info {
     users: User[],
     activity_types: ActivityTypes[]
 }
+export interface Group {
+    [key: number]: {
+        active: boolean,
+        id: number,
+        name: string,
+        users: User[],
+        sort: number
+    }
+}
+export interface Filter {
+    users: number[],
+    date: number,
+    activities: number[]
+}
