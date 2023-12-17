@@ -24,8 +24,11 @@ import { Group, Filter, Groups, User, ActivityTypes, Info, ActivityItem } from '
 
 
 const colors: string[] = ['#ffce6d', '#feff9f', '#fecaca', '#99cafd', '#C1C1C1', '#D5D8DB', '#CCFF66'];
-function getRandomColor(): string {
-    return colors[Math.floor(Math.random() * colors.length)]
+function getColor(id: number): string {
+    if (id == 81 || id == 82) {
+        return 'rgba(54, 106, 243, 1)'
+    }
+    return 'rgba(239, 136, 136, 1)'
 }
 
 let activityItems = {
@@ -321,7 +324,7 @@ export default defineComponent({
         types[type.id] = {
             name: type.name,
             id: type.id,
-            color: getRandomColor()
+            color: getColor(type.id)
         }
     }
     this.types = types;

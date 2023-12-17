@@ -13,7 +13,7 @@
 import { defineComponent } from 'vue';
 import { TimeActivity } from '../interfaces';
 interface Activities {
-    [key: number]: TimeActivity
+    [key: number | string ]: TimeActivity
 }
 
 export default defineComponent({
@@ -29,11 +29,24 @@ export default defineComponent({
             this.activities = {};
             for (let activity in this.userActivity) {
                 const type = this.userActivity[activity].type as number;
-                if (!this.activities[type]) this.activities[type] = {
-                    overall: 0,
-                    color: this.types[type].color
-                };
-                this.activities[type].overall += this.userActivity[activity].duration;
+                if (type == 82 || type == 81) {
+                    if (!this.activities['calls']) this.activities['calls'] = {
+                        overall: 0,
+                        color: this.types[type].color
+                    }
+                    this.activities['calls'].overall += this.userActivity[activity].duration;
+                } else {
+                    if (!this.activities['actions']) this.activities['actions'] = {
+                        overall: 0,
+                        color: this.types[type].color
+                    }
+                    this.activities['actions'].overall += this.userActivity[activity].duration;
+                }
+                // if (!this.activities[type]) this.activities[type] = {
+                //     overall: 0,
+                //     color: this.types[type].color
+                // };
+                // this.activities[type].overall += this.userActivity[activity].duration;
             }
             for (let activity in this.activities) {
                 const date = new Date(this.activities[activity].overall);
